@@ -1,0 +1,54 @@
+Here’s a high-level, prioritized backlog to get from today’s skeletal “OctaCell” prototype all the way to a playable, polished directional-contagion game.  I’ve grouped tasks by
+ broad category, but you can tackle them in roughly the order shown.
+
+    1. Core Grid & Cell Model
+       • Design a small abstraction for “GridType” (HEX, SQUARE, OCTAGON) and a unified Coordinate/Cell API.
+       • Replace the toy ring-only octagon generator with a correct octagonal (and hexagonal) grid generator (i.e. 8n cells in ring n for oct, proper axial coords for hex).
+       • Implement `calculateRelativeDirection` (and per-shape neighbor linking) so each cell’s `getNeighbor(dir)` works.
+    2. Foundation Tests
+       • Write unit tests for grid-generation and neighbor-linking on each shape (small n, edge cells, center).
+       • Verify that for a 2-ring octagon you actually get 1 + 8 + 16 = 25 cells with correct adjacencies.
+    3. Core Game Rules (`GameLogic`)
+       • Flesh out `isValidMove(cell)` (e.g. you can only rotate your own arrow or capture a neutral cell).
+       • Implement `makeMove(cell)`:
+         – Rotate/capture the selected cell.
+         – Recursively follow its arrow, capturing & rotating until a stopping condition.
+       • Encode stopping conditions (edge‐of‐grid, owned cell, loop, optional “stop on enemy”).
+    4. GameLogic Tests
+       • Unit-test single‐move chain reactions on minimal maps (e.g. 2×2 square, 2-ring octagon).
+       • Test all stopping conditions and that ownership/states update correctly.
+    5. Turn Management & Engine Integration
+       • Extend `GameEngine` to:
+         – Hold `GameLogic` and current player.
+         – Loop turns: read a move, validate, apply logic, switch player.
+       • Hook your `GameLogic` impl into `GameEngine.processTurn()`.
+    6. CLI User Interface
+       • Print the board each turn in ASCII (rings or matrix) with arrow-glyphs.
+       • Accept console input to pick a cell (by ring+dir or row/col) and rotate it.
+       • Validate input and surface errors back to the user.
+    7. Win & Stop Conditions
+       • Implement “all opponent cells eliminated” and “turn limit + majority” endgames.
+       • Allow the user to pick the win mode at startup.
+       • Display results and gracefully exit.
+    8. Integration & Regression Tests
+       • Write “play‐through” tests with scripted moves to exercise full games.
+       • CI integration to catch regressions in grid, logic or engine.
+    9. Game Modes & Configuration
+       • Expose quick/classic/challenge modes (board size, turn limit, victory thresholds).
+       • Allow configuration via command-line flags or a simple config file.
+    10. Single-Player AI Opponent
+           • Plug in a `Player` interface and a basic “random/greedy” CPU.
+           • Later iterate on heuristics or a minimax solver for deeper play.
+    11. Graphical UI / Visualization
+           • Swap or augment the CLI with a minimal JavaFX/Swing (or web) front-end.
+           • Draw octagons/hexes, arrow icons, and click/tap support.
+    12. Networked Multiplayer & Persistence
+           • Add a simple server/client layer so two humans can connect over TCP.
+           • Implement save/load so players can pause/resume.
+    13. Performance & Scalability
+           • Profile large boards (e.g. 9-ring hex or 20×20 octagon).
+           • Optimize the chain‐reaction recursion/loop detection and data structures.
+    14. Documentation & Packaging
+           • Update README with “Getting Started”, CLI flags, game-modes, config.
+           • Publish a runnable JAR or native installer.
+           • Write a short “Developer Guide” for how the grid and logic fit together.
