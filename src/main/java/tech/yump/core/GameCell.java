@@ -3,6 +3,7 @@ package tech.yump.core;
 import tech.yump.model.CellState;
 import tech.yump.model.Direction;
 import tech.yump.util.Coordinate;
+import tech.yump.util.CellUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -12,11 +13,13 @@ public class GameCell {
     private final Coordinate coordinate;
     private final GameCell[] neighbors;
     private CellState state;
+    private Direction arrowDirection;
     
     public GameCell(Coordinate coordinate) {
         this.coordinate = coordinate;
         this.neighbors = new GameCell[8]; // 8 directions for octagonal cells
         this.state = CellState.NEUTRAL;
+        this.arrowDirection = CellUtils.randomizeDirection(); // Initialize with a random direction
     }
     
     // Getters
@@ -30,6 +33,14 @@ public class GameCell {
     
     public void setState(CellState state) {
         this.state = state;
+    }
+    
+    public Direction getArrowDirection() {
+        return arrowDirection;
+    }
+
+    public void setArrowDirection(Direction arrowDirection) {
+        this.arrowDirection = arrowDirection;
     }
     
     public GameCell getNeighbor(Direction direction) {

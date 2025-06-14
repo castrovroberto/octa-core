@@ -140,8 +140,9 @@ public class GameMap {
     private String getCellStateRepresentation(CellState state) {
         return switch (state) {
             case NEUTRAL    -> "[N]";
-            case ENEMY      -> "[E]";
-            case PLAYER     -> "[P]";
+            case PLAYER_1   -> "[1]";
+            case PLAYER_2   -> "[2]";
+            case BLOCKED    -> "[B]";
         };
     }
 }

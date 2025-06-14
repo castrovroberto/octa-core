@@ -21,4 +21,15 @@ public enum Direction {
     public int getValue() {
         return value;
     }
+
+    // Helper method to rotate clockwise
+    public Direction rotateClockwise() {
+        int nextValue = (this.getValue() + 1) % 8; // 8 total directions
+        for (Direction dir : Direction.values()) {
+            if (dir.getValue() == nextValue) {
+                return dir;
+            }
+        }
+        return NORTH; // Should be unreachable
+    }
 }
