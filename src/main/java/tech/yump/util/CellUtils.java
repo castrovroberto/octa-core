@@ -2,13 +2,13 @@ package tech.yump.util;
 
 import tech.yump.model.Direction;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CellUtils {
 
     public static Direction randomizeDirection() {
-        Random rand = new Random();
-        return Direction.values()[rand.nextInt(8)];
+        return Direction.values()[ThreadLocalRandom.current()
+                .nextInt(Direction.values().length)];
     }
 
     /**
