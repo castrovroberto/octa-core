@@ -16,7 +16,7 @@ public class GameCell {
     public GameCell(Coordinate coordinate) {
         this.coordinate = coordinate;
         this.neighbors = new GameCell[8]; // 8 directions for octagonal cells
-        this.state = CellState.EMPTY;
+        this.state = CellState.NEUTRAL;
     }
     
     // Getters

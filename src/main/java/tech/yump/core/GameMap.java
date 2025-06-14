@@ -21,6 +21,13 @@ public class GameMap {
         this.gridType = gridType;
         initializeGameMap();
     }
+    /**
+     * Convenience constructor defaulting to OCTAGONAL grid type.
+     * @param size Ring size for octagonal grid
+     */
+    public GameMap(int size) {
+        this(size, GridType.OCTAGONAL);
+    }
 
     private void initializeGameMap() {
         // First pass: Create all cells in a square area based on size
@@ -132,9 +139,9 @@ public class GameMap {
      */
     private String getCellStateRepresentation(CellState state) {
         return switch (state) {
-            case EMPTY    -> "[E]";
-            case OCCUPIED -> "[O]";
-            case BLOCKED  -> "[B]";
+            case NEUTRAL    -> "[N]";
+            case ENEMY      -> "[E]";
+            case PLAYER     -> "[P]";
         };
     }
 }
