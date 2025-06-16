@@ -1,0 +1,50 @@
+# .github/workflows/build-and-test.yml
+
+name: Java CI Build and Test
+
+# Triggers the workflow on push or pull request events for the main branch
+on: [workflow_dispatch] # Only runs manually
+  #push:
+  #  branches: [ "main", "master" ]
+  #pull_request:
+  #  branches: [ "main", "master" ]
+
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checks out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up JDK 21, as specified in pom.xml
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21' # From <maven.compiler.source> in pom.xml
+          distribution: 'temurin'
+
+      # Step 3: Cache Maven dependencies for faster builds
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      # Step 4: Build the project and run all tests with Maven
+      # The 'test' goal automatically executes the surefire plugin, which runs JUnit tests.
+      - name: Build and Test with Maven
+        run: mvn -B clean test # '-B' runs Maven in non-interactive (batch) mode
+
+      # Step 5: Upload test results for better visibility
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: Maven Tests
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+          fail-on-error: true 

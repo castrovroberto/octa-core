@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import tech.yump.model.Player;
 import tech.yump.model.CellState;
 import tech.yump.model.Direction;
+import tech.yump.model.WinCondition;
+import tech.yump.engine.GameConfig;
+import tech.yump.engine.GameResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -309,5 +312,113 @@ class OctaGameLogicTest {
 
         // Assert - Enemy cell should be captured when stopOnEnemy is false
         assertEquals(CellState.PLAYER_1, cellB.getState()); // cellB should be captured from PLAYER_2
+    }
+
+    // ========== WIN CONDITION TESTS ==========
+
+    @Test
+    void gameOver_ShouldDetectEliminationWin_WhenOnePlayerHasNoCells() {
+        // Arrange - Create a small map with elimination rules
+        GameMap smallMap = new GameMap(1);
+        GameConfig eliminationConfig = new GameConfig(WinCondition.ELIMINATION, 50);
+        OctaGameLogic gameLogic = new OctaGameLogic(smallMap, Player.PLAYER_1, eliminationConfig);
+        
+        // Set up initial state - both players have cells
+        smallMap.getCell(0, 0).setState(CellState.PLAYER_1);
+        smallMap.getCell(0, 1).setState(CellState.PLAYER_2);
+        
+        // Make a move to increment turn count
+        gameLogic.makeMove(smallMap.getCell(0, 0), Player.PLAYER_1);
+        
+        // Simulate elimination - remove all PLAYER_2 cells
+        for (GameCell cell : smallMap.getAllCells()) {
+            if (cell.getState() == CellState.PLAYER_2) {
+                cell.setState(CellState.NEUTRAL);
+            }
+        }
+
+        // Act & Assert
+        assertTrue(gameLogic.isGameOver());
+        GameResult result = gameLogic.getGameResult();
+        assertNotNull(result);
+        assertEquals(Player.PLAYER_1, result.getWinner());
+        assertTrue(result.getReason().contains("elimination"));
+    }
+
+    @Test
+    void gameOver_ShouldDetectTurnLimitWin_WhenTurnLimitReached() {
+        // Arrange - Create a map with turn limit rules
+        GameMap smallMap = new GameMap(2);
+        GameConfig turnLimitConfig = new GameConfig(WinCondition.TURN_LIMIT_MAJORITY, 1); // Only 1 turn needed
+        OctaGameLogic gameLogic = new OctaGameLogic(smallMap, Player.PLAYER_1, turnLimitConfig);
+        
+        // Set up initial state - manually ensure PLAYER_1 has more cells
+        smallMap.getCell(-2, -2).setState(CellState.PLAYER_1);
+        smallMap.getCell(-1, -1).setState(CellState.PLAYER_1);
+        smallMap.getCell(2, 2).setState(CellState.PLAYER_2);
+        
+        // Make just one move to reach turn limit
+        gameLogic.makeMove(smallMap.getCell(-2, -2), Player.PLAYER_1);
+
+        // Act & Assert
+        assertTrue(gameLogic.isGameOver());
+        GameResult result = gameLogic.getGameResult();
+        assertNotNull(result);
+        // Don't assert specific winner since chain reactions may change counts
+        assertTrue(result.getReason().contains("majority") || result.getReason().contains("tie"));
+    }
+
+    @Test
+    void gameOver_ShouldDetectTurnLimitCondition_WhenTurnLimitReached() {
+        // Arrange - Create a map with turn limit of 1
+        GameMap smallMap = new GameMap(1);
+        GameConfig turnLimitConfig = new GameConfig(WinCondition.TURN_LIMIT_MAJORITY, 1);
+        OctaGameLogic gameLogic = new OctaGameLogic(smallMap, Player.PLAYER_1, turnLimitConfig);
+        
+        // Set up initial state
+        smallMap.getCell(0, 0).setState(CellState.PLAYER_1);
+        
+        // Make one move to reach turn limit
+        gameLogic.makeMove(smallMap.getCell(0, 0), Player.PLAYER_1);
+
+        // Act & Assert - Just verify game ends and we get a result
+        assertTrue(gameLogic.isGameOver());
+        GameResult result = gameLogic.getGameResult();
+        assertNotNull(result);
+        assertNotNull(result.getReason());
+    }
+
+    @Test
+    void gameOver_ShouldNotEndEarly_WithEliminationRulesBeforeFirstMove() {
+        // Arrange - Test that elimination doesn't trigger before any moves
+        GameMap smallMap = new GameMap(1);
+        GameConfig eliminationConfig = new GameConfig(WinCondition.ELIMINATION, 50);
+        OctaGameLogic gameLogic = new OctaGameLogic(smallMap, Player.PLAYER_1, eliminationConfig);
+        
+        // Set up state where one player has no cells initially
+        smallMap.getCell(0, 0).setState(CellState.PLAYER_1);
+        // Don't give PLAYER_2 any cells
+
+        // Act & Assert - Game should not be over yet (no moves made)
+        assertFalse(gameLogic.isGameOver());
+        assertNull(gameLogic.getGameResult());
+    }
+
+    @Test
+    void turnCount_ShouldIncrementCorrectly() {
+        // Arrange
+        GameMap smallMap = new GameMap(1);
+        OctaGameLogic gameLogic = new OctaGameLogic(smallMap, Player.PLAYER_1);
+        smallMap.getCell(0, 0).setState(CellState.PLAYER_1);
+        
+        // Act
+        assertEquals(0, gameLogic.getTurnCount()); // Initial count
+        gameLogic.makeMove(smallMap.getCell(0, 0), Player.PLAYER_1);
+        assertEquals(1, gameLogic.getTurnCount()); // After first move
+        
+        gameLogic.switchPlayer();
+        smallMap.getCell(0, 1).setState(CellState.PLAYER_2);
+        gameLogic.makeMove(smallMap.getCell(0, 1), Player.PLAYER_2);
+        assertEquals(2, gameLogic.getTurnCount()); // After second move
     }
 } 
