@@ -113,9 +113,19 @@ public class GameMap {
     }
 
     /**
+     * Returns the size (ring radius) of the map.
+     * @return The size parameter used to create this map
+     */
+    public int getSize() {
+        return size;
+    }
+
+    /**
      * Prints a textual representation of the game map to the console.
      * Uses a 2D grid layout instead of the old ring-based printout.
+     * @deprecated Use CLIView.printBoard() instead for enhanced visualization
      */
+    @Deprecated
     public void printMap() {
         System.out.println("--- Game Map (Size: " + size + ", GridType: " + gridType + ") ---");
         for (int y = size; y >= -size; y--) {

@@ -19,6 +19,18 @@ public class OctaGameLogic implements GameLogic {
         this.currentPlayer = startingPlayer;
     }
 
+    /**
+     * Constructor for testing purposes.
+     * @param gameMap The game map.
+     * @param startingPlayer The starting player.
+     * @param stopOnEnemy Sets the rule for stopping chains on enemy cells.
+     */
+    public OctaGameLogic(GameMap gameMap, Player startingPlayer, boolean stopOnEnemy) {
+        this.gameMap = gameMap;
+        this.currentPlayer = startingPlayer;
+        this.stopOnEnemy = stopOnEnemy;
+    }
+
     @Override
     public boolean isValidMove(GameCell cell, Player player) {
         if (cell == null) {
