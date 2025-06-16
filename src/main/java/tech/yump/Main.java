@@ -3,6 +3,7 @@ package tech.yump;
 import tech.yump.engine.GameEngine;
 import tech.yump.core.GameMap;
 import tech.yump.core.OctaGameLogic;
+import tech.yump.core.GameLogic;
 import tech.yump.model.Player;
 import tech.yump.model.CellState;
 import tech.yump.view.CLIView;
@@ -19,7 +20,7 @@ public class Main {
 
         // Create game components
         GameMap map = new GameMap(mapSize);
-        OctaGameLogic logic = new OctaGameLogic(map, Player.PLAYER_1);
+        GameLogic logic = new OctaGameLogic(map, Player.PLAYER_1);
         CLIView view = new CLIView(); // Create the view
         
         // Set up initial game state - give both players some starting cells

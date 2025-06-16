@@ -1,13 +1,18 @@
 package tech.yump.engine;
 
-import tech.yump.core.GameMap;
 import tech.yump.core.GameLogic;
+import tech.yump.core.GameMap;
 import tech.yump.core.GameCell;
 import tech.yump.model.GridType;
 import tech.yump.model.Player;
 import tech.yump.view.CLIView;
 import tech.yump.util.Coordinate;
 
+/**
+ * Simple game engine scaffold. The engine now accepts a {@link GameMap}
+ * and a {@link GameLogic} so tests or alternative game modes can provide
+ * custom implementations.
+ */
 public class GameEngine {
 
     private GameMap gameMap;
@@ -22,7 +27,23 @@ public class GameEngine {
     }
 
     /**
-     * Initialize the game engine with required components.
+     * Starts the game using the supplied map and logic.
+     *
+     * @param gameMap   the map to use for the game
+     * @param gameLogic the game logic implementation
+     */
+    public void startGame(GameMap gameMap, GameLogic gameLogic) {
+        this.gameMap = gameMap;
+        this.gameLogic = gameLogic;
+
+        System.out.println("Game started!");
+        if (this.gameMap != null) {
+            this.gameMap.printMap();
+        }
+    }
+
+    /**
+     * Initialize the game engine with required components including CLI view.
      * @param gameMap The game map to use
      * @param gameLogic The game logic to use
      * @param view The CLI view for user interaction
@@ -108,4 +129,12 @@ public class GameEngine {
         System.out.println("Game ended!");
     }
 
+    // Getter methods for testing purposes
+    public GameMap getGameMap() {
+        return gameMap;
+    }
+
+    public GameLogic getGameLogic() {
+        return gameLogic;
+    }
 }
